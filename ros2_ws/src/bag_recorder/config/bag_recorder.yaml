@@ -1,0 +1,31 @@
+allow_all: false
+
+topics:
+  - /tf_static
+  - /camera/camera_far/color/camera_info
+  - /camera/camera_far/color/image_raw/compressed
+  - /camera/camera_first/color/camera_info
+  - /camera/camera_first/color/image_raw/compressed
+  - /camera/camera_top/color/camera_info
+  - /camera/camera_top/color/image_raw/compressed
+  - /left_follower/joint_states
+  - /left_follower/joint_states_control
+  - /left_leader/joint_states
+  - /right_follower/joint_states
+  - /right_follower/joint_states_control
+  - /right_leader/joint_states
+  - /tf_static
+
+exclude_topics:
+  - ^/rosout.*$
+
+output_dir: /home/hrc/Lerobot_system/Dataset/bags
+
+storage: sqlite3           # sqlite3 or mcap (mcap requires its plugin installed)
+compression: none          # none or zstd
+compression_mode: file     # file or message (only used when compression != none)
+
+max_bag_size: 0            # Bytes; >0 enables automatic file splitting by size (eg.600 every 10 minutes)
+max_bag_duration: 0        # Seconds; >0 enables automatic file splitting by time (eg.1073741824 every 1 GiB)
+
+qos_profile_overrides_path: ""

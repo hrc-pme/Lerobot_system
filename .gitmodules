@@ -1,0 +1,7 @@
+[submodule "ros2_ws/src/realsense_ros"]
+	path = ros2_ws/src/realsense_ros
+	url = https://github.com/LesterLiou/realsense-ros.git
+[submodule "repos/lerobot"]
+	path = repos/lerobot
+	url = https://github.com/LesterLiou/lerobot.git
+	branch = lerobot-system
