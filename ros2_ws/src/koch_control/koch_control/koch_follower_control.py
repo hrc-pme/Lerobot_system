@@ -62,26 +62,53 @@ class KochFollower(Node):
             
             calibration = {}
             if calib_file.exists():
-                with open(calib_file) as f:
-                    data = json.load(f)
-                    # 處理兩種可能的 JSON 格式 (LeRobot 原生 vs 自定義)
-                    for m_key, m_val in data.items():
-                        if m_key == "motors": 
-                            # 遞迴或重新遍歷
-                            for sub_k, sub_v in m_val.items():
-                                calibration[sub_k] = self._make_calib_obj(sub_v)
-                            break
-                        else:
-                            calibration[m_key] = self._make_calib_obj(m_val)
-                self.get_logger().info(f"Loaded calibration: {calib_file}")
+                try:
+                    with open(calib_file) as f:
+                        data = json.load(f)
+                        # 處理兩種可能的 JSON 格式 (LeRobot 原生 vs 自定義)
+                        for m_key, m_val in data.items():
+                            if m_key == "motors": 
+                                # 遞迴或重新遍歷
+                                for sub_k, sub_v in m_val.items():
+                                    calibration[sub_k] = self._make_calib_obj(sub_v)
+                                break
+                            else:
+                                calibration[m_key] = self._make_calib_obj(m_val)
+                    self.get_logger().info(f"✅ Loaded calibration from {calib_file}")
+                    self.get_logger().info(f"   Calibration keys: {list(calibration.keys())}")
+                except Exception as e:
+                    self.get_logger().error(f"❌ Failed to load calibration: {e}")
+                    calibration = {}
             else:
-                self.get_logger().warn(f"Calibration not found: {calib_file}")
+                self.get_logger().warn(f"⚠️  Calibration not found: {calib_file}")
+                self.get_logger().warn(f"   Robot will use default settings (may not work correctly!)")
+                # 即使沒有校正文件，也要創建空的校正對象以避免錯誤
+                calibration = None
 
             # 建立 Bus
+            # 重要: DynamixelMotorsBus 需要正確的 calibration 參數才能正常工作
+            # calibration 用於 normalize/unnormalize 位置數據
+            self.get_logger().info(f"🔧 Creating DynamixelMotorsBus for {name}")
+            self.get_logger().info(f"   Port: {port}")
+            self.get_logger().info(f"   Motors: {list(motors.keys())}")
+            self.get_logger().info(f"   Calibration: {'✅ Loaded' if calibration else '❌ None'}")
+            
+            if calibration:
+                self.get_logger().info(f"   Calibration motors: {list(calibration.keys())}")
+            
             bus = DynamixelMotorsBus(port=port, motors=motors, calibration=calibration)
             try:
                 bus.connect()
+                self.get_logger().info(f"✅ Connected to {port}")
+                
+                # 檢查校正是否正確載入
+                if bus.calibration:
+                    self.get_logger().info(f"✅ Bus has calibration for: {list(bus.calibration.keys())}")
+                else:
+                    self.get_logger().error(f"❌ Bus calibration is None!")
+                
                 bus.enable_torque() # Follower 需保持位置
+                self.get_logger().info(f"✅ Torque enabled for {name}")
                 self.arms[name] = bus
                 
                 # ROS 介面
@@ -111,12 +138,13 @@ class KochFollower(Node):
         self.create_timer(1.0/pub_rate, self._publish)
 
     def _make_calib_obj(self, data):
+        # MotorCalibration 是 @dataclass，需要所有參數
         return MotorCalibration(
-            id=data.get('id', 0),
-            drive_mode=data.get('drive_mode', 0),
-            homing_offset=data.get('homing_offset', 0),
-            range_min=data.get('range_min', 0),
-            range_max=data.get('range_max', 4096)
+            id=int(data.get('id', 0)),
+            drive_mode=int(data.get('drive_mode', 0)),
+            homing_offset=int(data.get('homing_offset', 0)),
+            range_min=int(data.get('range_min', 0)),
+            range_max=int(data.get('range_max', 4095))
         )
 
     def _publish(self):

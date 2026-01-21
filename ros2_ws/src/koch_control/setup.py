@@ -37,6 +37,9 @@ setup(
             'koch_leader_follower_control = koch_control.koch_leader_follower_control:main',
             'koch_teleop_bridge = koch_control.koch_teleop_bridge:main',
             'koch_calibration = koch_control.koch_calibration:main',
+            'koch_endeffector_control = koch_control.koch_endeffector_control:main',
+            'moveit_bridge = koch_control.moveit_bridge:main',
+            'koch_ee_commander = koch_control.koch_ee_commander:main',
         ],
     },
 )

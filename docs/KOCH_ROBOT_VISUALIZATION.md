@@ -58,6 +58,10 @@ ros2 launch koch_simulation real_robot_display.launch.py source_topic:=/left_fol
 ros2 launch koch_simulation dual_real_robot_display.launch.py
 ```
 
+```bash 
+ros2 launch koch_simulation dual_robot_camera.launch.py
+```
+
 #### 💡 RViz 設定指南 (重要)
 第一次啟動雙手模式時，RViz 可能只會顯示一隻手臂。請依照以下步驟設定：
 

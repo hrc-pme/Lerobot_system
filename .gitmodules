@@ -5,3 +5,9 @@
 	path = repos/lerobot
 	url = https://github.com/LesterLiou/lerobot.git
 	branch = lerobot-system
+[submodule "ros2_ws/src/koch_tactile_ros2"]
+	path = ros2_ws/src/koch_tactile_ros2
+	url = https://github.com/LesterLiou/koch_tactile_ros2.git
+[submodule "repos/koch_tactile"]
+	path = repos/koch_tactile
+	url = https://github.com/LesterLiou/Tactile.git
