@@ -45,8 +45,17 @@ def generate_launch_description():
     tf_world_camera_top = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        arguments=['0', '0.2', '0.6', '0', '1.57', '0', 'world', 'camera_top_link'],
+        arguments=['0', '0.16', '0.5', '-1.57', '1.57', '0', 'world', 'camera_top_link'],
         name='tf_world_camera_top'
+    )
+    
+    # Bridge: camera_top_link -> camera_top (RealSense base_link)
+    # RealSense 驅動會從 camera_top 發出座標鏈
+    tf_camera_top_realsense = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'camera_top_link', 'camera_top'],
+        name='tf_camera_top_realsense'
     )
 
     # Camera Far (Looking from front ?)
@@ -56,13 +65,29 @@ def generate_launch_description():
         arguments=['0', '0.5', '0.1', '3.14', '0', '0', 'world', 'camera_far_link'],
         name='tf_world_camera_far'
     )
+    
+    # Bridge: camera_far_link -> camera_far (RealSense base_link)
+    tf_camera_far_realsense = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'camera_far_link', 'camera_far'],
+        name='tf_camera_far_realsense'
+    )
 
     # Camera First (Side view ?)
     tf_world_camera_first = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        arguments=['0', '-0.1', '0.3', '-0', '0', '0', 'world', 'camera_first_link'],
+        arguments=['0.04', '-0.18', '0.22', '1.57', '0.52', '0', 'world', 'camera_first_link'],
         name='tf_world_camera_first'
+    )
+    
+    # Bridge: camera_first_link -> camera_first (RealSense base_link)
+    tf_camera_first_realsense = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'camera_first_link', 'camera_first'],
+        name='tf_camera_first_realsense'
     )
 
     # --- Left Arm Group ---
@@ -136,8 +161,11 @@ def generate_launch_description():
         tf_world_left,
         tf_world_right,
         tf_world_camera_top,
+        tf_camera_top_realsense,
         tf_world_camera_far,
+        tf_camera_far_realsense,
         tf_world_camera_first,
+        tf_camera_first_realsense,
         left_group,
         right_group,
         rviz_node

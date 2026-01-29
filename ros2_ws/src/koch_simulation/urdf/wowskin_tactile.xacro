@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="wowskin_tactile_sensors">
+  
+  <!--
+  WowSkin 觸覺感測器的 TF frames
+  5 個感測器排列在 gripper_static_1 的表面
+  
+  假設感測器排列方式：
+  
+       [1]
+   [2] [0] [3]
+       [4]
+       
+  每個感測器尺寸約 24mm × 64mm
+  間距約 20mm
+  -->
+  
+  <xacro:macro name="wowskin_tactile_sensors" params="prefix:='' parent">
+    
+    <!-- 觸覺感測器基座（在 gripper_static_1 的表面） -->
+    <link name="${prefix}tactile_base_link">
+      <visual>
+        <geometry>
+          <!-- 視覺化：一個平面代表感測器陣列 -->
+          <box size="0.08 0.08 0.002"/>  <!-- 80mm × 80mm × 2mm -->
+        </geometry>
+        <material name="tactile_surface">
+          <color rgba="0.8 0.3 0.3 0.5"/>  <!-- 半透明紅色 -->
+        </material>
+      </visual>
+    </link>
+    
+    <!-- 將觸覺基座附加到 gripper -->
+    <joint name="${prefix}tactile_base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}tactile_base_link"/>
+      <!-- 調整這個位置讓感測器對齊 gripper 表面 -->
+      <!-- xyz: 向前 0mm, 向右 0mm, 向上 15mm -->
+      <origin xyz="0.0 0.0 0.015" rpy="0 0 0"/>
+    </joint>
+    
+    <!-- 5 個獨立的觸覺感測器 frames -->
+    
+    <!-- Sensor 0: 中央 -->
+    <link name="${prefix}wowskin_sensor_0"/>
+    <joint name="${prefix}wowskin_sensor_0_joint" type="fixed">
+      <parent link="${prefix}tactile_base_link"/>
+      <child link="${prefix}wowskin_sensor_0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    </joint>
+    
+    <!-- Sensor 1: 上方 -->
+    <link name="${prefix}wowskin_sensor_1"/>
+    <joint name="${prefix}wowskin_sensor_1_joint" type="fixed">
+      <parent link="${prefix}tactile_base_link"/>
+      <child link="${prefix}wowskin_sensor_1"/>
+      <origin xyz="0.0 0.025 0.0" rpy="0 0 0"/>  <!-- 向上 25mm -->
+    </joint>
+    
+    <!-- Sensor 2: 左方 -->
+    <link name="${prefix}wowskin_sensor_2"/>
+    <joint name="${prefix}wowskin_sensor_2_joint" type="fixed">
+      <parent link="${prefix}tactile_base_link"/>
+      <child link="${prefix}wowskin_sensor_2"/>
+      <origin xyz="-0.025 0.0 0.0" rpy="0 0 0"/>  <!-- 向左 25mm -->
+    </joint>
+    
+    <!-- Sensor 3: 右方 -->
+    <link name="${prefix}wowskin_sensor_3"/>
+    <joint name="${prefix}wowskin_sensor_3_joint" type="fixed">
+      <parent link="${prefix}tactile_base_link"/>
+      <child link="${prefix}wowskin_sensor_3"/>
+      <origin xyz="0.025 0.0 0.0" rpy="0 0 0"/>  <!-- 向右 25mm -->
+    </joint>
+    
+    <!-- Sensor 4: 下方 -->
+    <link name="${prefix}wowskin_sensor_4"/>
+    <joint name="${prefix}wowskin_sensor_4_joint" type="fixed">
+      <parent link="${prefix}tactile_base_link"/>
+      <child link="${prefix}wowskin_sensor_4"/>
+      <origin xyz="0.0 -0.025 0.0" rpy="0 0 0"/>  <!-- 向下 25mm -->
+    </joint>
+    
+  </xacro:macro>
+  
+</robot>

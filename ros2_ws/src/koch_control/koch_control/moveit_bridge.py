@@ -14,7 +14,7 @@ class MoveItBridge(Node):
         # Match real_robot_remapper.py logic
         self.joint_map = {
             'right_follower_shoulder_pan':  ('joint1', -1, 0.0),
-            'right_follower_shoulder_lift': ('joint2', -1, 1.57),
+            'right_follower_shoulder_lift': ('joint2', -1, 1.05), # Adjusted by -30 deg (1.57 - 0.52)
             'right_follower_elbow_flex':    ('joint3', 1, 1.57),
             'right_follower_wrist_flex':    ('joint4', -1, 0.0),
             'right_follower_wrist_roll':    ('joint5', 1, 0.0),

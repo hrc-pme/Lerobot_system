@@ -19,7 +19,7 @@ class RealRobotRemapper(Node):
         
         self.mapping = {
             'shoulder_pan':  ('joint1', -1, 0.0),
-            'shoulder_lift': ('joint2', -1, 1.57), 
+            'shoulder_lift': ('joint2', -1, 1.05), 
             'elbow_flex':    ('joint3', 1, 1.57),
             'wrist_flex':    ('joint4', -1, 0.0),
             'wrist_roll':    ('joint5', 1, 0.0),
