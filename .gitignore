@@ -305,3 +305,15 @@ model/
 experiments/
 
 repos/vt-refine
+
+# dataset
+*.rrd
+*.db3
+*.bag
+
+# visualization
+viz_output/
+viz_output_ee/
+
+# rosbag
+test_ee_bag/
