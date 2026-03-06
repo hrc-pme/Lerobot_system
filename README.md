@@ -651,3 +651,30 @@ Apache 2.0 License
 - MGS 渲染器 + 觸覺 Mesh 可視化
 
 
+
+
+python3 /home/hrc/Lerobot_system/repos/lerobot/src/lerobot/scripts/lerobot_dataset_viz.py \
+  --repo-id koch_bi_wipe_water \
+  --root /home/hrc/Lerobot_system/Dataset/converted_dataset3 \
+  --episode-index 0 \
+  --display-compressed-images 1 \
+  --save 1 \
+  --output-dir /home/hrc/Lerobot_system/viz_output
+
+python3 /home/lesterliou02/lerobot/src/lerobot/scripts/lerobot_train.py \
+  --dataset.repo_id koch_bi_wipe_water \
+  --dataset.root /home/lesterliou02/lerobot/Koch_IL/converted_dataset3 \
+  --policy.type act \
+  --policy.repo_id lesterliou02/koch_bi_wipe_water_policy \
+  --output_dir /home/lesterliou02/lerobot/output \
+  --wandb.enable true \
+  --wandb.project lerobot_koch_test
+
+python3 /home/hrc/Lerobot_system/repos/lerobot/src/lerobot/scripts/lerobot_train.py \
+  --dataset.repo_id koch_bi_wipe_water \
+  --dataset.root /home/hrc/Lerobot_system/Dataset/converted_dataset3 \
+  --policy.type act \
+  --policy.repo_id lesterliou02/koch_bi_wipe_water_policy \
+  --output_dir /home/hrc/Lerobot_system/output2 \
+  --wandb.enable true \
+  --wandb.project lerobot_koch_test

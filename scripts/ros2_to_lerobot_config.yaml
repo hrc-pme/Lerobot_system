@@ -1,0 +1,51 @@
+dataset:
+  repo_id: "koch_bi_wipe_water_2" # Identifier for the dataset, e.g., "koch_bi_wipe_water"
+  fps: 30
+  root: "/home/hrc/Lerobot_system/Dataset/0303_clearwater_yellowtableconverted_dataset"
+  task: "Wipe the water" # Description for the task
+
+rosbag:
+  path: "/home/hrc/Lerobot_system/Dataset/bags/0303_clearwater_yellowtable"
+  # Optional: Limit number of messages/seconds to process for testing
+  max_messages: -1 
+
+robot:
+  type: "koch_bimanual"
+  state_dim: 12
+  action_dim: 12
+
+# Topic to LeRobot feature mapping
+mapping:
+  # Camera topics (CompressedImage or Image)
+  cameras:
+    "/camera/camera_top/color/image_raw/compressed": 
+      key: "observation.images.top"
+      width: 1280
+      height: 720
+    "/camera/camera_far/color/image_raw/compressed": 
+      key: "observation.images.far"
+      width: 1280
+      height: 720
+    "/camera/camera_first/color/image_raw/compressed": 
+      key: "observation.images.first"
+      width: 1280
+      height: 720
+
+  # Robot State (JointState) -> observation.state
+  # Supports multiple topics to be concatenated
+  state:
+    key: "observation.state"
+    topics:
+      - name: "/left_follower/joint_states"
+        dim: 6
+      - name: "/right_follower/joint_states"
+        dim: 6
+
+  # Robot Action (JointState) -> action
+  action:
+    key: "action"
+    topics:
+      - name: "/left_leader/joint_states"
+        dim: 6
+      - name: "/right_leader/joint_states"
+        dim: 6

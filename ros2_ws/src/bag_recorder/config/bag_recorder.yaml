@@ -19,7 +19,7 @@ topics:
 exclude_topics:
   - ^/rosout.*$
 
-output_dir: /home/hrc/Lerobot_system/Dataset/bags
+output_dir: /home/hrc/Lerobot_system/Dataset/bags/0303_clearwater_yellowtable
 
 storage: sqlite3           # sqlite3 or mcap (mcap requires its plugin installed)
 compression: none          # none or zstd
