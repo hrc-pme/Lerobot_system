@@ -32,7 +32,17 @@ class BagConverter:
         self.interval = 1.0 / self.fps
         
         # Prepare output path
-        self.root_path = Path(self.config['dataset']['root']).expanduser()
+        if 'output' in self.config and 'path' in self.config['output']:
+            self.root_path = Path(self.config['output']['path']).expanduser()
+        else:
+            # Fallback for older configs
+            self.root_path = Path(self.config['dataset']['root']).expanduser()
+
+        # Safety check: Don't delete the input bag directory!
+        base_path = Path(self.config['rosbag']['path']).expanduser()
+        if self.root_path.resolve() == base_path.resolve():
+            raise ValueError(f"Error: Output path ({self.root_path}) is the same as input bag path! Change output.path in config to prevent data loss.")
+
         if self.root_path.exists():
             print(f"Warning: Output directory {self.root_path} exists. Cleaning it up...")
             shutil.rmtree(self.root_path)

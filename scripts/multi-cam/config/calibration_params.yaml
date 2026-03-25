@@ -1,0 +1,18 @@
+camera_first2:
+  child_link_frame: camera_first2_link
+  child_optical_frame: camera_first2_color_optical_frame
+  parent_frame: camera_top_color_optical_frame
+  pos: [-0.004062297821358451, -0.6362415844515236, -0.0425350887731163]
+  quat: [0.0005893826531444422, 0.5459684677064511, 0.8377498723856196, 0.009655890235302975]
+camera_left:
+  child_link_frame: camera_left_link
+  child_optical_frame: camera_left_color_optical_frame
+  parent_frame: camera_top_color_optical_frame
+  pos: [0.3702587818459679, 0.11361210434995164, 0.035442732830232915]
+  quat: [0.26082218295770077, -0.3251223063615487, -0.6407224283567332, 0.6447806174071751]
+camera_right:
+  child_link_frame: camera_right_link
+  child_optical_frame: camera_right_color_optical_frame
+  parent_frame: camera_top_color_optical_frame
+  pos: [-0.41736481960724164, 0.018216208809147882, 0.03210077536003994]
+  quat: [0.32534688800906514, 0.27628290652042153, 0.6506513001048958, 0.6280685023938503]

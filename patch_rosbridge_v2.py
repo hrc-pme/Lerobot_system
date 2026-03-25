@@ -21,7 +21,8 @@ target = """def _from_object_inst(inst: ROSMessage, _rostype: str) -> dict:
 
 replacement = """def _from_object_inst(inst: ROSMessage, _rostype: str) -> dict:
     if isinstance(inst, (bytes, bytearray)):
-        return list(inst)
+        import base64
+        return base64.b64encode(inst).decode('ascii')
 
     # Create an empty dict then populate with values from the inst
     msg = {}"""

@@ -1,0 +1,55 @@
+dataset:
+  repo_id: "koch_bi_wipe_water_tissue_ee" # Identifier for the dataset
+  fps: 30
+  task: "Wipe the water with tissue (End-Effector)"
+
+output:
+  path: "/home/hrc/Lerobot_system/Dataset/Converted_dataset/koch_bi_wipe_water_tissue_ee_2"
+
+rosbag:
+  path: "/home/hrc/Lerobot_system/Dataset/bags/0320_wipewuthTissue"
+  max_messages: -1 
+
+robot:
+  type: "koch_bimanual_ee"
+  state_dim: 16 # 8 (7 pos+quat + 1 gripper) * 2 arms
+  action_dim: 16 # 8 (7 pos+quat + 1 gripper) * 2 arms
+
+# Topic to LeRobot feature mapping
+mapping:
+  # Camera topics (CompressedImage or Image)
+  cameras:
+    "/camera/camera_top/color/image_raw/compressed": 
+      key: "observation.images.top"
+      width: 1280
+      height: 720
+    "/camera/camera_far/color/image_raw/compressed": 
+      key: "observation.images.far"
+      width: 1280
+      height: 720
+    "/camera/camera_first/color/image_raw/compressed": 
+      key: "observation.images.first" # Changed from 'first' to 'wrist' if that was intended, but keeping user's convention
+      width: 1280
+      height: 720
+
+  # Robot State (JointState) -> FK -> observation.state
+  state:
+    key: "observation.state"
+    topics:
+      - name: "/left_follower/joint_states"
+        dim: 8 # EE Pose dim + gripper
+        arm: "left"
+      - name: "/right_follower/joint_states"
+        dim: 8 # EE Pose dim + gripper
+        arm: "right"
+
+  # Robot Action (JointState) -> FK -> action
+  action:
+    key: "action"
+    topics:
+      - name: "/left_follower/joint_states_control" # Using same topic for action (teleop)
+        dim: 8
+        arm: "left"
+      - name: "/right_follower/joint_states_control"
+        dim: 8
+        arm: "right"

@@ -21,9 +21,9 @@ from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 
 
-configurable_parameters = [{'name': 'camera_name',                  'default': 'camera_top', 'description': 'camera unique name'},
+configurable_parameters = [{'name': 'camera_name',                  'default': 'camera_first2', 'description': 'camera unique name'},
                            {'name': 'camera_namespace',             'default': 'camera', 'description': 'namespace for camera'},
-                           {'name': 'serial_no',                    'default': "'323522062437'", 'description': 'choose device by serial number'},
+                           {'name': 'serial_no',                    'default': "'241222061237'", 'description': 'choose device by serial number'},
                            {'name': 'usb_port_id',                  'default': "''", 'description': 'choose device by usb port id'},
                            {'name': 'device_type',                  'default': "''", 'description': 'choose device by type'},
                            {'name': 'config_file',                  'default': "''", 'description': 'yaml config file'},
@@ -62,7 +62,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'gyro_fps',                     'default': '0', 'description': "''"},
                            {'name': 'accel_fps',                    'default': '0', 'description': "''"},
                            {'name': 'unite_imu_method',             'default': "0", 'description': '[0-None, 1-copy, 2-linear_interpolation]'},
-                           {'name': 'clip_distance',                'default': '0', 'description': "''"},
+                           {'name': 'clip_distance',                'default': '0.0', 'description': 'Remove points beyond this distance (0=disabled, allows closer points)'},
                            {'name': 'angular_velocity_cov',         'default': '0.01', 'description': "''"},
                            {'name': 'linear_accel_cov',             'default': '0.01', 'description': "''"},
                            {'name': 'diagnostics_period',           'default': '0.0', 'description': 'Rate of publishing diagnostics. 0=Disabled'},
@@ -72,7 +72,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'pointcloud.stream_filter',     'default': '2', 'description': 'texture stream for pointcloud'},
                            {'name': 'pointcloud.stream_index_filter','default': '0', 'description': 'texture stream index for pointcloud'},
                            {'name': 'pointcloud.ordered_pc',        'default': 'false', 'description': ''},
-                           {'name': 'pointcloud.allow_no_texture_points', 'default': 'false', 'description': "''"},
+                           {'name': 'pointcloud.allow_no_texture_points', 'default': 'true', 'description': 'Allow points without texture (helps with closer range)'},
                            {'name': 'align_depth.enable',           'default': 'true', 'description': 'enable align depth filter'},
                            {'name': 'colorizer.enable',             'default': 'false', 'description': 'enable colorizer filter'},
                            {'name': 'decimation_filter.enable',     'default': 'false', 'description': 'enable_decimation_filter'},

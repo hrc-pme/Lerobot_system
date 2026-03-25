@@ -1,10 +1,10 @@
 # ========================================================
-# CUDA 12.8 with Ubuntu 22.04
+# Ubuntu 22.04 (CPU only)
 # ROS2 Humble
-# PyTorch cu 12.8
+# PyTorch (CPU)
 # Python 3.10
 # ========================================================
-FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
+FROM ubuntu:22.04
 
 # ===================================================================       
 # Locale & non root user
@@ -19,14 +19,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN echo 'Etc/UTC' > /etc/timezone && \
     ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
-# ===================================================================
-# NVIDIA Runtime
-# ===================================================================
-ENV NVIDIA_VISIBLE_DEVICES=all \
-    NVIDIA_DRIVER_CAPABILITIES=all
-
 # ==================================================================
-# Install basic packages (avoid CUDA repo issues)
+# Install basic packages
 # ===================================================================
 RUN apt-get update --allow-releaseinfo-change && apt-get install -y --no-install-recommends \
     # Build tools
@@ -144,7 +138,7 @@ RUN git clone --branch ${LEROBOT_REF} https://github.com/LesterLiou/lerobot.git 
 # ===================================================================
 RUN python3 -m pip uninstall -y torch torchvision torchaudio || true \
     && pip install --upgrade pip \
-    && pip install --no-cache-dir   torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128 \
+    && pip install --no-cache-dir   torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cpu \
     && pip install --no-cache-dir \
         "numpy<2.0.0" matplotlib==3.8.* scipy pandas \
         scikit-learn scikit-image Pillow \
@@ -152,13 +146,6 @@ RUN python3 -m pip uninstall -y torch torchvision torchaudio || true \
         anyskin pygame dynamixel-sdk \
         opencv-contrib-python transforms3d pin
 
-
-
-# ===================================================================
-# ADD  
-# ===================================================================
-
-    
 # ===================================================================
 # Create non-root user and setup workspace  
 # ===================================================================
@@ -184,8 +171,6 @@ WORKDIR ${HOME}
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc && \
     echo "source /opt/venv/bin/activate" >> ${HOME}/.bashrc && \
     echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ${HOME}/.bashrc && \
-    echo "export CUDA_VISIBLE_DEVICES=0" >> ${HOME}/.bashrc && \
-    echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64:\${LD_LIBRARY_PATH}" >> ${HOME}/.bashrc && \
     echo "" >> ${HOME}/.bashrc && \
     echo "# Useful aliases for ROS2 development" >> ${HOME}/.bashrc && \
     echo "alias cb='cd ~/Lerobot_system/ros2_ws && rm -rf install build log && colcon build --merge-install && source install/setup.bash'" >> ${HOME}/.bashrc
@@ -198,6 +183,7 @@ WORKDIR ${HOME}
 # 11345: ROS2 default discovery port  
 # 7400-7500: ROS2 DDS communication range
 EXPOSE 11311 11345 7400-7500
+
 # ===================================================================
 # Entrypoint: auto source ROS + venv
 # ===================================================================
@@ -205,4 +191,3 @@ COPY ros_venv_entrypoint.sh /ros_venv_entrypoint.sh
 
 ENTRYPOINT ["/ros_venv_entrypoint.sh"]
 CMD ["/bin/bash"]
-

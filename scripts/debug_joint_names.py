@@ -2,7 +2,7 @@ import rosbag2_py
 from rclpy.serialization import deserialize_message
 from sensor_msgs.msg import JointState
 
-bag_path = 'Dataset/bags/0303_clearwater_yellowtable/0001'
+bag_path = '/home/hrc/Lerobot_system/Dataset/bags/0320_wipewuthTissue/0001'
 
 reader = rosbag2_py.SequentialReader()
 storage_options = rosbag2_py.StorageOptions(uri=bag_path, storage_id='sqlite3')

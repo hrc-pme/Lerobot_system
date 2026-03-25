@@ -317,3 +317,5 @@ viz_output_ee/
 
 # rosbag
 test_ee_bag/
+
+calibration/

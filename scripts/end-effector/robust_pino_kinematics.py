@@ -65,15 +65,24 @@ class RobotKinematics:
         
         return pos, rot
 
-    def inverse_kinematics_5dof(self, target_pos, target_quat, q_init, max_iter=20, tol=1e-3, damping=1.0):
+    def inverse_kinematics_5dof(self, target_pos, target_quat, q_init, max_iter=50, tol=1e-3, damping=0.01, pos_weight=1.0, rot_weight=0.05):
         """
-        Damped Least Squares IK using Pinocchio.
-        Higher damping (1.0) helps with stability near singularity for 5DOF
+        Damped Least Squares IK using Pinocchio with Weights.
+        
+        Args:
+            pos_weight: Weight for position error (default 1.0)
+            rot_weight: Weight for rotation error (default 0.05). 
+                        Lowering this helps 5-DOF arms prioritize position and avoid flipping/instability.
+            damping: Damping factor (lambda) for DLS. Increasing stabilizes near singularity.
         """
         q = np.array(q_init, dtype=np.float64)
         
         # Target Transform
         oMdes = pin.SE3(pin.Quaternion(np.array(target_quat)), np.array(target_pos))
+        
+        # Weight Matrix (Diagonal 6x6)
+        # First 3 are position, Last 3 are rotation
+        W = np.diag([pos_weight]*3 + [rot_weight]*3)
         
         for i in range(max_iter):
             pin.framesForwardKinematics(self.model, self.data, q)
@@ -82,40 +91,45 @@ class RobotKinematics:
             # Current Transform
             oMf = self.data.oMf[self.tip_frame_id]
             
-            # Error in Local Frame of End Effector (body frame)
-            # oMf.actInv(oMdes) is T_curr_des (Position of Desired in Current frame)
+            # Error in Local Frame
             dMf = oMf.actInv(oMdes) 
-            err = pin.log(dMf).vector # 6D error vector (linear + angular)
+            err = pin.log(dMf).vector # 6D error vector
             
-            # For 5-DOF, we cannot achieve arbitrary 6D pose (rotation around EE axis usually free or constrained)
-            # Let's see if relaxing one rotational DOF helps.
-            # But DLS should handle it naturally by minimizing overall error norm.
-            # If err is too big, DLS might do weird things.
+            # Apply Weights using Matrix multiplication to handle vector shape correctly
+            err_w = W @ err
             
-            # If error is small enough, we are done
-            if np.linalg.norm(err) < tol:
+            if np.linalg.norm(err_w) < tol:
                 break
                 
             # Jacobian in Local Frame
             J = pin.getFrameJacobian(self.model, self.data, self.tip_frame_id, pin.ReferenceFrame.LOCAL)
             
-            # DLS: J*dq = err
-            # dq = J.T * (J J.T + l^2 I)^-1 * err
+            # Weighted Jacobian: Multiply rows by weights
+            # J is 6 x nq. We want to weight the rows (task dimensions).
+            J_w = W @ J
             
-            J_h = J.T
-            A = J @ J_h + np.eye(6) * (damping**2)
+            # DLS: J_w * dq = err_w
+            # dq = J_w.T * (J_w J_w.T + lambda^2 I)^-1 * err_w
             
-            # Standard DLS
-            x = np.linalg.solve(A, err)
-            dq = J_h @ x
+            H = J_w @ J_w.T + np.eye(6) * (damping**2)
+            
+            # Solve linear system
+            try:
+                # Use solve instead of inv for numerical stability
+                x = np.linalg.solve(H, err_w)
+                dq = J_w.T @ x
+            except np.linalg.LinAlgError:
+                 # Fallback if singular
+                 dq = np.zeros_like(q)
             
             # Clamp step magnitude to prevent jumps
-            if np.linalg.norm(dq) > 0.1:
-                dq = dq * (0.1 / np.linalg.norm(dq))
+            step_norm = np.linalg.norm(dq)
+            if step_norm > 0.1:
+                dq = dq * (0.1 / step_norm)
             
             q = pin.integrate(self.model, q, dq)
             
             # Enforce limits (simple clipping)
-            # q = np.clip(q, self.q_min, self.q_max) # Be careful with continuous joints if any
+            # q = np.clip(q, self.q_min, self.q_max) 
             
         return q
