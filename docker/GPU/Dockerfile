@@ -100,6 +100,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ===================================================================
+# Patch rosbridge message_conversion for bytearray support
+# ===================================================================
+COPY patch_rosbridge_v2.py /tmp/patch_rosbridge_v2.py
+RUN python3 /tmp/patch_rosbridge_v2.py && rm /tmp/patch_rosbridge_v2.py
+
+# ===================================================================
 # RealSense 2.56.5
 # ===================================================================
 ENV LIBREALSENSE_VERSION=2.56.5
@@ -146,7 +152,7 @@ RUN python3 -m pip uninstall -y torch torchvision torchaudio || true \
     && pip install --upgrade pip \
     && pip install --no-cache-dir   torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128 \
     && pip install --no-cache-dir \
-        "numpy<2.0.0" matplotlib==3.8.* scipy pandas \
+        numpy==1.26.4 matplotlib==3.8.* scipy pandas \
         scikit-learn scikit-image Pillow \
         pyserial pexpect future pyquaternion pyyaml \
         anyskin pygame dynamixel-sdk \

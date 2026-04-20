@@ -319,3 +319,5 @@ viz_output_ee/
 test_ee_bag/
 
 calibration/
+
+outputs_nano/

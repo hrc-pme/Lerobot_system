@@ -40,6 +40,7 @@ setup(
             'koch_endeffector_control = koch_control.koch_endeffector_control:main',
             'moveit_bridge = koch_control.moveit_bridge:main',
             'koch_ee_commander = koch_control.koch_ee_commander:main',
+            'koch_vr_control = koch_control.koch_vr_control:main',
         ],
     },
 )

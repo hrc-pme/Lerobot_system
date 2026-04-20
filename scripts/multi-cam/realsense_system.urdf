@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<robot name="realsense_multi_cam_system">
+
+  <!-- ================= LINKS ================= -->
+  <link name="camera_right_link">
+    <visual>
+      <geometry>
+        <box size="0.02 0.09 0.02"/>
+      </geometry>
+      <material name="realsense_gray">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="camera_left_link">
+    <visual>
+      <geometry>
+        <box size="0.02 0.09 0.02"/>
+      </geometry>
+      <material name="realsense_gray">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="camera_top_color_optical_frame">
+    <visual>
+      <geometry>
+        <box size="0.02 0.09 0.02"/>
+      </geometry>
+      <material name="realsense_gray">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="camera_first2_link">
+    <visual>
+      <geometry>
+        <box size="0.02 0.09 0.02"/>
+      </geometry>
+      <material name="realsense_gray">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- ================= JOINTS ================= -->
+  <joint name="camera_top_color_optical_frame_to_camera_first2_link" type="fixed">
+    <parent link="camera_top_color_optical_frame"/>
+    <child link="camera_first2_link"/>
+    <!-- x y z | r p y -->
+    <origin xyz="-0.009335 -0.650019 -0.023262" rpy="1.066122 -0.049428 3.119424"/>
+  </joint>
+
+  <joint name="camera_top_color_optical_frame_to_camera_left_link" type="fixed">
+    <parent link="camera_top_color_optical_frame"/>
+    <child link="camera_left_link"/>
+    <!-- x y z | r p y -->
+    <origin xyz="0.356945 0.096177 0.017345" rpy="0.801457 0.012841 -1.466565"/>
+  </joint>
+
+  <joint name="camera_top_color_optical_frame_to_camera_right_link" type="fixed">
+    <parent link="camera_top_color_optical_frame"/>
+    <child link="camera_right_link"/>
+    <!-- x y z | r p y -->
+    <origin xyz="-0.424158 -0.003938 0.039420" rpy="0.872878 -0.015725 1.588261"/>
+  </joint>
+
+</robot>

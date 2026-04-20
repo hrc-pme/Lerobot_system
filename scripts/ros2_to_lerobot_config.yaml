@@ -7,10 +7,10 @@ dataset:
 output:
   # The dataset will be saved here. The folder name will be the last part of this path.
   # WARNING: This directory will be deleted if it exists!
-  path: "/home/hrc/Lerobot_system/Dataset/Converted_dataset/koch_bi_wipe_water_tissue"
+  path: "/home/hrc/Lerobot_system/Dataset/Converted_dataset/merged_wipewuthTissue"
 
 rosbag:
-  path: "/home/hrc/Lerobot_system/Dataset/bags/0320_wipewuthTissue"
+  path: "/home/hrc/Lerobot_system/Dataset/bags/merged_wipewuthTissue"
   # Optional: Limit number of messages/seconds to process for testing
   max_messages: -1 
 

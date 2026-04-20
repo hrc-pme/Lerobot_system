@@ -678,3 +678,17 @@ python3 /home/hrc/Lerobot_system/repos/lerobot/src/lerobot/scripts/lerobot_train
   --output_dir /home/hrc/Lerobot_system/output2 \
   --wandb.enable true \
   --wandb.project lerobot_koch_test
+
+
+python3 /home/hrc/Lerobot_system/repos/lerobot/src/lerobot/scripts/lerobot_train.py \
+  --dataset.repo_id koch_bi_wipe_water_vr \
+  --dataset.root /home/hrc/Lerobot_system/Dataset/Converted_dataset/lerobot_format_dataset_3cams \
+  --policy.type act \
+  --policy.repo_id lesterliou02/koch_bi_wipe_water_policy_vr \
+  --output_dir /home/hrc/Lerobot_system/output/vr \
+  --wandb.enable true \
+  --wandb.project lerobot_koch_test_vr
+
+
+  wandb login 
+  wandb sync

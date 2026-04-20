@@ -94,6 +94,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ===================================================================
+# Patch rosbridge message_conversion for bytearray support
+# ===================================================================
+COPY patch_rosbridge_v2.py /tmp/patch_rosbridge_v2.py
+RUN python3 /tmp/patch_rosbridge_v2.py && rm /tmp/patch_rosbridge_v2.py
+
+# ===================================================================
 # RealSense 2.56.5
 # ===================================================================
 ENV LIBREALSENSE_VERSION=2.56.5

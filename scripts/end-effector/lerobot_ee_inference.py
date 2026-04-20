@@ -20,7 +20,7 @@ import os
 
 # --- Configuration ---
 # Update this with your actual EE-trained model path
-CHECKPOINT_PATH = "/home/hrc/Lerobot_system/outputs_nano/koch_bi_wipe_water_tissue_ee/checkpoints/040000/pretrained_model"
+CHECKPOINT_PATH = "/home/hrc/Lerobot_system/outputs_nano/koch_bi_wipe_water_tissue_ee_2/checkpoints/080000/pretrained_model"
 
 # Add paths for robust_pino_kinematics
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -62,6 +62,17 @@ class LeRobotEEInferenceNode(Node):
         
         self.policy.eval()
         self.get_logger().info("Policy loaded successfully!")
+
+        # --- Homing Configuration ---
+        self.is_homed = False
+        self.homing_start_time = None
+        self.homing_complete_time = None
+        self.homing_duration = 2.0  # seconds to move to home
+        self.homing_wait = 1.0      # seconds to wait after reaching home
+
+        # [shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll, gripper]
+        self.initial_left = np.array([0.054470, -1.117778, 1.6210464, -0.240894, -0.082088, 0.524750], dtype=np.float32)
+        self.initial_right = np.array([-0.052935, -1.186057, 1.646363, -0.204069, 6.305433, 0.522448], dtype=np.float32)
 
         # --- 2. Initialize Kinematics ---
         urdf_l = "/tmp/koch_left.urdf"
@@ -182,6 +193,42 @@ class LeRobotEEInferenceNode(Node):
         # 1. Check Data Availability
         if self.last_q_left is None or self.last_q_right is None:
             return # Waiting for joints
+
+        # --- Homing Logic ---
+        if not self.is_homed:
+            current_left = self.get_current_raw_joints('left')
+            current_right = self.get_current_raw_joints('right')
+            
+            # Start Homing Timer
+            if self.homing_start_time is None:
+                self.homing_start_time = time.time()
+                self.start_left = current_left.copy()
+                self.start_right = current_right.copy()
+                self.get_logger().info(f"Starting homing sequence over {self.homing_duration} seconds...")
+
+            # Calculate Progress
+            elapsed = time.time() - self.homing_start_time
+            alpha = np.clip(elapsed / self.homing_duration, 0.0, 1.0)
+            
+            # Interpolate Position
+            cmd_left = self.start_left * (1 - alpha) + self.initial_left * alpha
+            cmd_right = self.start_right * (1 - alpha) + self.initial_right * alpha
+            
+            self.publish_raw_joints(self.pub_left, cmd_left, "left_follower")
+            self.publish_raw_joints(self.pub_right, cmd_right, "right_follower")
+
+            # Check Completion
+            if alpha >= 1.0:
+                if self.homing_complete_time is None:
+                    self.homing_complete_time = time.time()
+                    self.get_logger().info(f"Reached Home. Waiting {self.homing_wait} seconds before inference...")
+                
+                wait_elapsed = time.time() - self.homing_complete_time
+                if wait_elapsed >= self.homing_wait:
+                    self.get_logger().info("Homing and Wait Complete. Starting Policy Inference.")
+                    self.is_homed = True
+            
+            return
             
         for k in self.camera_keys.values():
             if k not in self.latest_images:
@@ -309,6 +356,58 @@ class LeRobotEEInferenceNode(Node):
                     self.get_logger().warn(f"Joint {name} not found in mapping, appending 0.0")
                     msg.position.append(0.0)
                     
+        pub.publish(msg)
+
+    def get_current_raw_joints(self, side):
+        if side == 'left':
+            q = self.last_q_left
+            gripper = self.last_gripper_left
+            mapping = self.map_left
+            kin = self.kin_left
+            prefix = "left_follower"
+        else:
+            q = self.last_q_right
+            gripper = self.last_gripper_right
+            mapping = self.map_right
+            kin = self.kin_right
+            prefix = "right_follower"
+            
+        ordered_names = [
+            f"{prefix}_shoulder_pan",
+            f"{prefix}_shoulder_lift",
+            f"{prefix}_elbow_flex",
+            f"{prefix}_wrist_flex",
+            f"{prefix}_wrist_roll",
+            f"{prefix}_gripper"
+        ]
+        
+        vals = []
+        for name in ordered_names:
+            if 'gripper' in name:
+                vals.append(gripper)
+            else:
+                urdf_name = mapping.get(name)
+                if urdf_name:
+                     joint_id = kin.model.getJointId(urdf_name)
+                     idx = kin.model.joints[joint_id].idx_q
+                     vals.append(q[idx])
+                else:
+                     vals.append(0.0)
+        return np.array(vals)
+
+    def publish_raw_joints(self, pub, joints, prefix):
+        msg = JointState()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        ordered_names = [
+            f"{prefix}_shoulder_pan",
+            f"{prefix}_shoulder_lift",
+            f"{prefix}_elbow_flex",
+            f"{prefix}_wrist_flex",
+            f"{prefix}_wrist_roll",
+            f"{prefix}_gripper"
+        ]
+        msg.name = ordered_names
+        msg.position = joints.tolist()
         pub.publish(msg)
 
 def main(args=None):

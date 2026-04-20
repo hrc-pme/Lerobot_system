@@ -130,6 +130,7 @@ class RobotKinematics:
             q = pin.integrate(self.model, q, dq)
             
             # Enforce limits (simple clipping)
-            # q = np.clip(q, self.q_min, self.q_max) 
+            if hasattr(self.model, 'lowerPositionLimit') and hasattr(self.model, 'upperPositionLimit'):
+                q = np.clip(q, self.model.lowerPositionLimit, self.model.upperPositionLimit)
             
         return q

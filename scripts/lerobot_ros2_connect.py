@@ -14,7 +14,7 @@ from lerobot.utils.constants import ACTION
 from pathlib import Path
 
 # Adjust this path to your checkpoint
-CHECKPOINT_PATH = "/home/hrc/Lerobot_system/outputs_nano/koch_bi_wipe_water_tissue/checkpoints/060000/pretrained_model"
+CHECKPOINT_PATH = "/home/hrc/Lerobot_system/outputs_nano/merged_wipewuthTissue_hyp2/checkpoints/080000/pretrained_model"
 
 class LeRobotROS2Bridge(Node):
     def __init__(self):
@@ -210,7 +210,8 @@ class LeRobotROS2Bridge(Node):
 
         # [shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll, gripper]
         self.initial_left = np.array([0.054470, -1.117778, 1.6210464, -0.240894, -0.082088, 0.524750], dtype=np.float32)
-        self.initial_right = np.array([-0.052935, -1.186057, 1.646363, -0.204069, 6.305433, 0.522448], dtype=np.float32)
+        #self.initial_right = np.array([-0.052935, -1.186057, 1.646363, -0.204069, 6.259402798690872, 0.522448], dtype=np.float32)
+        self.initial_right = np.array([-0.052935, -1.186057, 1.646363, -0.204069, -0.2984321, 0.522448], dtype=np.float32)
 
         # Control Loop (e.g., 30Hz to match training FPS)
         self.dt = 1.0 / 30.0

@@ -11,3 +11,10 @@
 [submodule "repos/koch_tactile"]
 	path = repos/koch_tactile
 	url = https://github.com/LesterLiou/Tactile.git
+[submodule "repos/koch_robot_unity"]
+	path = repos/koch_robot_unity
+	url = git@github.com:hrc-pme/koch_robot_unity.git
+	branch = dev
+[submodule "repos/openarm_dev"]
+	path = repos/openarm_dev
+	url = git@github.com:hrc-pme/openarm_dev.git
