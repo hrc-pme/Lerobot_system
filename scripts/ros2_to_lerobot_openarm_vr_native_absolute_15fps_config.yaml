@@ -1,0 +1,63 @@
+dataset:
+  repo_id: "openarm_vr_native_absolute_full10_15fps"
+  fps: 15
+  task: "Wipe the table with a cloth and place the cloth in the box"
+
+rosbag:
+  path: "Dataset/Raw_rosbag/openarm_vr_native_baseline_v1"
+  include: ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010"]
+  exclude: []
+
+output:
+  path: "Dataset/Converted_dataset/openarm_vr_native_absolute_v1/full"
+
+robot:
+  type: "openarm_bimanual"
+  state_dim: 16
+  action_dim: 16
+
+sync:
+  # Canonical policy clock. Native cameras are approximately 15 Hz.
+  max_skew_sec: 0.12
+  # Measured state alone is bracketed and linearly interpolated.
+  max_numeric_gap_sec: 0.12
+  # Controller actions use the last real command at/before each policy tick.
+  controller_command_sampling: "previous"
+  max_command_age_sec: 0.05
+  fail_on_skipped_frames: true
+
+validation:
+  max_raw_state_arm_delta_rad: 0.20
+  max_raw_arm_command_delta_rad: 0.20
+  max_raw_gripper_delta_m: 0.02
+
+phase_trim:
+  # Preserve the complete demonstrations. No event alignment or prefix removal.
+  enabled: false
+
+mapping:
+  state_key: "observation.state"
+  action_key: "action"
+  action_source: "controller_command"
+  action_lead_steps: 1
+  cameras:
+    "/camera/camera1/color/image_raw/compressed":
+      key: "observation.images.camera1"
+      width: 640
+      height: 360
+    "/camera/camera2/color/image_raw/compressed":
+      key: "observation.images.camera2"
+      width: 640
+      height: 360
+    "/camera/camera3/color/image_raw/compressed":
+      key: "observation.images.camera3"
+      width: 640
+      height: 360
+
+audit:
+  # Sidecar maps every dataset row back to exact bag timestamps.
+  write_frame_provenance: true
+
+image_writer:
+  processes: 4
+  threads: 4
